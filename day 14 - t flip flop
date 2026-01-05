@@ -1,0 +1,46 @@
+module t_ff( input t,
+            input clk,
+            input rst,
+            output reg q);
+            
+always@(posedge clk or posedge rst)
+begin
+        if(~rst)
+        q <= 0;
+        else
+        q <= ~t;
+end
+endmodule
+
+  //////////////////////////////////////////////////
+  
+module t_ff_tb();
+
+reg t;
+reg clk=0;
+reg rst;
+wire q;
+
+t_ff dut(.t(t),.clk(clk),.rst(rst),.q(q));
+always #5 clk = ~clk;
+
+initial begin
+rst = 0;
+#20;
+rst = 1;
+
+#10; t = 1;
+#10; t = 0;
+#10;  t = 1;
+#10; t = 1;
+#10; t = 0;
+#10;  t = 1;
+#10; t = 1;
+#10; t = 0;
+#10;  t = 1;
+
+#120;
+$finish;
+end
+
+endmodule
