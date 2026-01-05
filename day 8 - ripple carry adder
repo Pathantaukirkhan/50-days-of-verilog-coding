@@ -1,0 +1,51 @@
+module par_ful(input a,b,cin,
+                output sum,carry);
+                
+assign sum = a ^ b ^ cin;
+assign carry = (a & b) | (b & cin) | (cin & b);
+endmodule
+
+  /////////////////////////////////////////////////
+
+  module full_parallel(input [3:0] A , B,
+                     input CIN,
+                     output [3:0]SUM,
+                     output CARRY);
+wire W1,W2,W3; 
+
+par_ful f1 (A[0],B[0],CIN, SUM[0], W1);
+par_ful f2 (A[1],B[1],W1, SUM[1], W2);
+par_ful f3 (A[2],B[2],W2, SUM[2], W3);
+par_ful f4 (A[3],B[3],W3, SUM[3], CARRY);
+                  
+endmodule
+
+
+  ////////TESETBENCH//////
+module par_addr_tb;
+    reg [3:0] A , B;
+    reg CIN;
+    wire [3:0]SUM;
+    wire CARRY;
+   
+full_parallel dut (A,B,CIN,SUM,CARRY);
+
+initial
+    begin
+      $display("start repeating the loop");
+   repeat(10) begin
+   A = $random;
+   $display(" value of A is %d",A);
+   B = $random ;
+  $display(" value of B is %d",B);
+   CIN = $random;
+ $display(" value of CIN is %d",CIN);
+ #5;
+  end
+  $finish;
+  end
+  initial begin
+  $monitor("input values A = %d B= %d, CIN = %d, output SUM = %d, CARRY = %0d",A,B,CIN,SUM,CARRY);   end
+endmodule
+
+  
