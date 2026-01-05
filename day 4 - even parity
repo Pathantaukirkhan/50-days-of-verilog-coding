@@ -1,0 +1,28 @@
+module even_parity( input [7:0]a, 
+                    input wire parity_in, 
+                    output wire error);
+
+    assign error = ^{ parity_in, a};
+    
+endmodule
+
+  /////TESTBENCH///
+
+  module even_generator_tb();
+    reg [7:0]a;
+    reg parity_in;
+    wire error;
+    
+    even_parity dut (a,parity_in,error);
+    
+    initial begin
+        a = 8'b00000000;
+        parity_in = 1;
+        #10;
+        a = 8'b00000001;
+        parity_in = 0;
+        #10;
+        a = 8'b00000011;
+        parity_in = 1;
+    end
+endmodule
