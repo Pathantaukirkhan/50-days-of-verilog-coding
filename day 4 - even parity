@@ -8,7 +8,7 @@ endmodule
 
   /////TESTBENCH///
 
-  module even_generator_tb();
+  module even_parity_tb();
     reg [7:0]a;
     reg parity_in;
     wire error;
