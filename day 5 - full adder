@@ -1,0 +1,33 @@
+module full_adder(
+                    input [2:0]a,b,cin,
+                    output [4:0] sum,carry
+    );
+    
+    assign sum = a ^ b ^ cin;
+    assign carry = ((a ^ b) & cin | a&b); 
+endmodule
+
+  ///TESTBENCH////
+
+module full_adder_tb();
+        reg [2:0] a,b,cin;
+        wire [4:0] sum,carry;
+        
+        integer i;
+        
+full_adder dut(a,b,cin,sum,carry);
+
+initial
+    begin
+        for(i = 0; i <256; i = i + 1)
+            begin
+                {a,b,cin} = i;
+                #5;
+            end
+         $finish;
+    end
+initial begin
+$monitor("input a = %b, b = %b, cin = %b, output sum = %b, carry = %b",a,b,cin,sum,carry);          
+        end
+endmodule
+  
