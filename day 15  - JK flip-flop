@@ -1,0 +1,62 @@
+module jk_ff(
+    input j, k,
+    input clk, rst,
+    output reg q
+);
+
+always @(posedge clk or posedge rst) begin
+    if (rst)
+        q <= 1'b0;     // reset output
+    else begin
+        case ({j,k})
+            2'b00: q <= q;    // no change
+            2'b01: q <= 1'b0; // reset
+            2'b10: q <= 1'b1; // set
+            2'b11: q <= ~q;   // toggle
+        endcase
+    end
+end
+
+endmodule
+///////////////////////////////////////////////
+
+  `timescale 1ns / 1ps
+
+module jk_ff_tb();
+
+reg j, k;
+reg clk = 0;
+reg rst;
+wire q;
+
+// Instantiate DUT
+jk_ff dut(.j(j), .k(k), .clk(clk), .rst(rst), .q(q));
+
+// Clock generation (10 ns period)
+always #5 clk = ~clk;
+
+initial begin
+    // Initialize
+    j = 0; k = 0; rst = 1;
+    
+    // Apply reset for a few cycles
+    #12 rst = 0;
+
+    // Test all cases
+    #8  {j,k} = 2'b00;   // Hold
+    #10 {j,k} = 2'b01;   // Reset
+    #10 {j,k} = 2'b10;   // Set
+    #10 {j,k} = 2'b11;   // Toggle
+    #10 {j,k} = 2'b11;   // Toggle again
+    #10 {j,k} = 2'b00;   // Hold again
+    
+    // Finish
+    #20 $finish;
+end
+
+// Monitor signals
+initial begin
+    $monitor("Time=%0t | rst=%b | J=%b | K=%b | Q=%b", $time, rst, j, k, q);
+end
+
+endmodule
