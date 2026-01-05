@@ -1,0 +1,92 @@
+module mag_comparator(
+    input  [4:0] a, b,
+    output reg mag_grt,
+    output reg mag_ls,
+    output reg mag_eqal,
+    output reg [4:0] q,
+    output sign_a, sign_b   // expose MSB as "signs"
+);
+
+    reg [3:0] in_a, in_b;
+
+    // sign bits = MSB of inputs
+    assign sign_a = a[4];
+    assign sign_b = b[4];
+
+    always @(*) begin
+        in_a = a[3:0];
+        in_b = b[3:0];
+
+        // defaults
+        mag_grt  = 0;
+        mag_ls   = 0;
+        mag_eqal = 0;
+        q = 0;
+
+        if (sign_a && !sign_b) begin
+            mag_ls = 1;
+            q = in_a | in_b;
+        end
+        else if (!sign_a && sign_b) begin
+            mag_grt = 1;
+            q = in_a & in_b;
+        end
+        else if (in_a > in_b) begin
+            mag_grt = 1;
+            q = in_a;
+        end
+        else if (in_a < in_b) begin
+            mag_ls = 1;
+            q = in_b;
+        end
+        else begin
+            mag_eqal = 1;
+            q = in_a; // equal case
+        end
+    end
+endmodule
+
+          ///////////////////////////////////////////////
+
+          timescale 1ns / 1ps
+
+module mag_comparator_tb();
+
+    reg [4:0] a, b;
+    wire mag_grt, mag_ls, mag_eqal;
+    wire [4:0] q;
+    wire sign_a, sign_b;
+
+    // DUT
+    mag_comparator dut(
+        .a(a),
+        .b(b),
+        .mag_grt(mag_grt),
+        .mag_ls(mag_ls),
+        .mag_eqal(mag_eqal),
+        .q(q),
+        .sign_a(sign_a),
+        .sign_b(sign_b)
+    );
+
+    integer i;
+
+    initial begin
+        a = 0; b = 0;
+        #5;
+
+        // Random values for 10 cycles
+        for (i = 0; i < 10; i = i + 1) begin
+            a = $random % 32;   // 5-bit input
+            b = $random % 32;   // 5-bit input
+            #10;
+        end
+        $finish;
+    end
+
+    initial begin
+        $monitor("T=%0t, a=%0d(%b) b=%0d(%b) sign_a=%b sign_b=%b >%b <%b =%b q=%0d",
+                 $time, a, a, b, b, sign_a, sign_b, mag_grt, mag_ls, mag_eqal, q);
+    end
+endmodule
+
