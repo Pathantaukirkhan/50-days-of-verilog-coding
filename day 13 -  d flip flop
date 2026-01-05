@@ -1,0 +1,55 @@
+module d_ff(
+            input din,
+            input clk,rst,
+            output reg q);
+            
+always@(posedge clk or negedge rst)
+begin
+        if(~rst)
+            q <= 0;
+        else 
+            q <= din;
+end
+endmodule
+
+  ////////////////////////////////////////////
+  `timescale 1ns / 1ps
+
+module d_ff_tb();
+    reg din;
+    reg clk = 0;
+    reg rst;
+    wire q;
+    
+    // Instantiate DUT
+    d_ff dut(.din(din), .clk(clk), .rst(rst), .q(q));
+    
+    // Clock generation (10ns period)
+    always #5 clk = ~clk;
+    
+    initial begin
+        // Initialize
+        din = 0;
+        rst = 0;
+        
+        // Apply reset
+        #12 rst = 1;   // release reset after some time
+        
+        // Apply test values
+        #8  din = 1;
+        #10 din = 0;
+        #10 din = 1;
+        #10 din = 0;
+        #10 din = 1;
+        #10 din = 1;
+        #10 din = 0;
+        
+        // Finish simulation
+        #20 $finish;
+    end
+    
+    // Monitor values
+    initial begin
+        $monitor("Time=%0t | rst=%b | din=%b | q=%b", $time, rst, din, q);
+    end
+endmodule
