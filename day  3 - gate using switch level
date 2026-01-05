@@ -1,0 +1,33 @@
+module nor_g(
+        input vin1,vin2,
+        output out
+    );
+    
+    supply0 gnd;
+    supply1 vdd;
+    wire temp;
+    pmos ( temp, vdd,vin1);
+    pmos (out,temp, vin2);
+    nmos (out, gnd, vin1);
+    nmos (out, gnd, vin2);
+    
+endmodule
+
+
+  //////TESTBENCH///
+
+  module nor_g_tb();
+    reg vin1, vin2;
+    wire out;
+    
+    nor_g dut( vin1, vin2, out);
+    
+    initial vin1 = 1'b0;
+    initial vin2 = 1'b0;
+    
+    initial forever #50 vin1 = ~vin1;
+    initial forever #100 vin2 = ~vin2;
+    
+    initial #600 $finish;
+    
+endmodule
