@@ -1,0 +1,129 @@
+module d(input d,clk,rst,output reg q);
+always@(posedge clk)
+if(rst)
+q <= 0;
+else 
+q <= d;
+endmodule
+
+module jk(input j,k,clk,rst,output q);
+wire w1;
+assign w1 = (j & ~q) | (~k & q);
+
+d f1(.d(w1),.clk(clk),.rst(rst),.q(q));
+
+endmodule
+
+
+module dff_using_jkff_tb();
+reg j,k,clk,rst;
+wire q;
+
+jk dut(.j(j),.k(k),.clk(clk),.rst(rst),.q(q));
+
+initial begin
+
+clk = 0;
+forever #5 clk = ~clk;
+end
+
+initial begin
+repeat(10) begin
+@(negedge clk);
+{rst,j,k} = $random;
+#10;
+end
+$finish;
+end
+endmodule
+
+  //////////////////////////////////////////////////////////
+
+  
+module d(input d,clk,rst, output reg q);
+
+always@(posedge clk) begin
+if(rst==1)
+q <= 1'b0;
+else 
+q <= d;
+
+end
+endmodule
+module dtosr(input s,r,clk,rst, output q);
+wire w1;
+assign w1 = ((q & ~r) | s);
+
+d f1(.d(w1),.clk(clk),.rst(rst),.q(q));
+endmodule
+
+  
+module d_sr_tb();
+
+reg s,r,clk,rst;
+wire q;
+
+dtosr dut(s,r,clk,rst,q);
+always #5 clk = ~clk;
+initial begin
+clk = 1;
+rst = 0;
+repeat(10) begin
+@(negedge clk)
+{rst,s,r} = $random;
+#1;
+end
+$finish;
+end
+endmodule
+
+
+  /////////////////////////////////////////////////////////////////////////////////
+
+  
+module d_t(input d,clk,rst, output q,nq);
+reg temp;
+assign q = temp;
+assign nq = ~q;
+always@(posedge clk) begin
+if(rst==1)
+temp <= 0;
+else
+temp <= d;
+end
+endmodule
+
+module t_ff(input t, clk, rst, output q, nq);
+  wire q_int, nq_int;
+  wire w1;
+
+  assign w1 = t ^ q_int;   
+  assign q = q_int;
+  assign nq = nq_int;
+
+  d_t ff(.d(w1), .clk(clk), .rst(rst), .q(q_int), .nq(nq_int));
+endmodule
+
+  
+module d_t_tb();
+reg t,clk,rst;
+wire q,nq;
+
+
+t_ff dut(.t(t),.clk(clk),.rst(rst),.q(q),.nq(nq));
+
+always #5 clk = ~clk;
+
+initial begin
+clk = 1;
+repeat(10) begin
+@(negedge clk)
+{rst,t} = $random;
+#5;
+
+end
+$finish;
+end
+endmodule
+
+  
