@@ -1,0 +1,37 @@
+module t_ff(input t,clk,rst, output reg q);
+always@(*) begin
+if(~rst)
+    q<=0;
+    else
+    case({t})
+    1'b1 : q <= 0;
+    1'b0 : q <= 1; 
+endcase
+end
+
+endmodule
+///////////////////////////////////////////////////////////////////////
+module sr_t(input s,r,clk,rst, output q);
+
+t_ff dut(.clk(clk),.rst(rst),.t(s),.q(q));
+endmodule
+///////////////////////////////////////////////////////////////////////
+module sr_t_tb();
+    reg s,r;
+    reg clk = 0;
+    reg rst;
+    wire q;
+    always #5 clk = ~clk;
+   sr_t dut(.clk(clk),.rst(rst),.s(s),.r(r),.q(q));
+initial begin
+rst = 0;
+#10;
+rst = 1;
+
+repeat(20) begin
+s = $random;
+#5;
+end
+$finish;
+end
+endmodule
