@@ -1,0 +1,22 @@
+module full_sub(input a,b,c,
+                output dif,bor);
+assign dif =  a ^ b ^ c;
+assign bor = ((~a & b) | (c & ~(a^b)));
+endmodule
+
+  //TESTBENCH//
+
+  module full_sub_tb();
+reg a,b,c;
+wire dif,bor;
+integer i = 0;
+
+full_sub dut(a,b,c,dif,bor);
+initial begin
+for(i=0; i<=7; i = i+1) begin
+{a,b,c} = i;
+#5;
+$display("input a = %d, b =%d, c = %d, output dif = %d, bor = %d", a,b,c,dif,bor);
+end
+end
+endmodule
