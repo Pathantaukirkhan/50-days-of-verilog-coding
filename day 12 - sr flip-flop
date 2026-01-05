@@ -1,0 +1,55 @@
+module sr_ff(
+    input s, r,
+    input clk, rst,
+    output reg q
+);
+
+always @(posedge clk or posedge rst) begin
+    if (rst)
+        q <= 1'b0;            // Reset output
+    else begin
+        case ({s,r})
+            2'b00 : q <= q;   // No change
+            2'b01 : q <= 1'b0; // Reset
+            2'b10 : q <= 1'b1; // Set
+            2'b11 : q <= 1'bx; // Invalid (undefined)
+        endcase
+    end
+end
+
+endmodule
+/////////////////////////////////////////
+
+          
+module sr_ff_tb();
+    reg s,r;
+    reg clk=0;
+    reg rst = 0;
+    wire q;
+    
+  sr_ff dut(.s(s),.r(r),.clk(clk),.rst(rst),.q(q));
+    always #5 clk = ~clk;
+    
+    initial begin
+        rst = 1;
+        #20;
+        rst = 0;
+        #3;
+        {s,r} = {1'b1,1'b0};
+        $display("value of s = %d, r = %d and q = %d",s,r,q);
+        #10;
+        
+         {s,r} = {1'b0,1'b0};
+        $display("value of s = %d, r = %d and q = %d",s,r,q);
+        #10;
+        
+         {s,r} = {1'b0,1'b1};
+        $display("value of s = %d, r = %d and q = %d",s,r,q);
+        #10;
+        
+         {s,r} = {1'b1,1'b1};
+        $display("value of s = %d, r = %d and q = %d",s,r,q);
+    #10;
+    #50; $finish;
+            end
+endmodule
